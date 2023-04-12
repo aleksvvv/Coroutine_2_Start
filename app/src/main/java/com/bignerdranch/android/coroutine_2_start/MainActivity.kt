@@ -7,8 +7,10 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bignerdranch.android.coroutine_2_start.databinding.ActivityMainBinding
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -17,30 +19,42 @@ class MainActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
+    private val viewModel by lazy {
+        ViewModelProvider(this)[MainViewModel::class.java]
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        binding.buttonLoad.setOnClickListener {
-            binding.progress.isVisible = true
-            binding.buttonLoad.isEnabled = false
-            val jobCity = lifecycleScope.launch {
 
-                val city = loadCity()
-                binding.tvLocation.text = city
-            }
-            val jobTemp = lifecycleScope.launch {
-                val temp = loadTemperature()
-                binding.tvTemperature.text = temp.toString()
-            }
-            lifecycleScope.launch {
-                jobCity.join()
-                jobCity.join()
-                binding.progress.isVisible = false
-                binding.buttonLoad.isEnabled = true
-            }
-        }
+        viewModel.method()
+
+
+//        binding.buttonLoad.setOnClickListener {
+//            binding.progress.isVisible = true
+//            binding.buttonLoad.isEnabled = false
+//            val deferredCity = lifecycleScope.async {
+//
+//                val city = loadCity()
+//                binding.tvLocation.text = city
+//                city
+//            }
+//            val deferredTemp = lifecycleScope.async {
+//                val temp = loadTemperature()
+//                binding.tvTemperature.text = temp.toString()
+//                temp
+//            }
+//            lifecycleScope.launch {
+//                val city = deferredCity.await()
+//                val temp = deferredTemp.await()
+//                binding.progress.isVisible = false
+//                binding.buttonLoad.isEnabled = true
+//                Toast.makeText(
+//                    this@MainActivity, "City: $city, $temp", Toast.LENGTH_SHORT
+//                ).show()
+//            }
+//        }
     }
 
     private suspend fun loadData() {
